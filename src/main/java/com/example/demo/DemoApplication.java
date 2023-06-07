@@ -3,7 +3,6 @@ package com.example.demo;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
@@ -12,10 +11,8 @@ import reactor.netty.http.client.HttpClient;
 import reactor.netty.resources.LoopResources;
 
 import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLException;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
@@ -34,7 +31,7 @@ public class DemoApplication {
 		String artifactoryUrl = "https://artifactory.moderne.ninja/artifactory";
 		String username = System.getenv("ARTIFACTORY_USER");
 		String password = System.getenv("ARTIFACTORY_PASSWORD");
-		String repo = "moderne-ingest"; //System.getenv("ARTIFACTORY_REPO")
+		String repo = System.getenv("ARTIFACTORY_REPO");
 
 		WebClient.Builder webClientBuilder = WebClient.builder();
 
@@ -88,19 +85,14 @@ public class DemoApplication {
 				.header("Authorization", "Basic " + Base64.getEncoder().encodeToString(
 						(username + ":" + password).getBytes(StandardCharsets.UTF_8))
 				)
-				.bodyValue(String.format("""
-      					items.find({"name":{"$match":"*-ast.jar"}, "repo":{"$eq": "%s"},"modified":{"$gt":"2023-06-06T18:32:36.47577639Z"}}).include("name","repo","path","modified").limit(1000)
-					""", repo)
+				.bodyValue(String.format("items.find({\"repo\":{\"$match\":\"%s\"},\"modified\":{\"$gt\":\"2023-06-06T19:41:08.369148104Z\"}}).include(\"name\",\"repo\",\"path\",\"modified\").limit(100)",
+						repo)
 				)
 				.retrieve()
 				.bodyToMono(String.class)
-				.flatMap(s -> {
-					System.out.println(s);
-					return null;
-				})
+				.doOnNext(System.out::println)
 				.block();
 
 		System.exit(0);
 	}
-
 }

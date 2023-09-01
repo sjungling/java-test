@@ -31,7 +31,7 @@ public class DemoApplication {
 		String artifactoryUrl = "https://artifactory.moderne.ninja/artifactory";
 		String username = System.getenv("ARTIFACTORY_USER");
 		String password = System.getenv("ARTIFACTORY_PASSWORD");
-		String repo = System.getenv("ARTIFACTORY_REPO");
+		String repo = System.getenv("ARTIFACTORY_REPOSSSS");
 
 		WebClient.Builder webClientBuilder = WebClient.builder();
 
